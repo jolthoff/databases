@@ -25,7 +25,9 @@ describe("Persistent Node Chat Server", function() {
        // })
     /* Empty the db table before each test so that multiple tests
      * (or repeated runs of the tests) won't screw each other up: */
-    dbConnection.query("select * from " + tablename, done);
+    dbConnection.query("delete from " + 'messages');
+    dbConnection.query("delete from " + 'users');
+    dbConnection.query("delete from " + 'roomname', done);
   });
 
   afterEach(function() {
@@ -76,6 +78,10 @@ describe("Persistent Node Chat Server", function() {
     // them up to you. */
 
     var queryString = "SELECT * FROM messages";
+    var queryPost = "INSERT INTO messages (username, message, roomname) VALUES ('Janny', 'What the...?', 'NotHello')";
+    dbConnection.query(queryPost, function(err, results) {
+      if (err) {console.log(err)}
+    })
 
     dbConnection.query(queryString, function(err) {
       if (err) { throw err; }
@@ -84,11 +90,10 @@ describe("Persistent Node Chat Server", function() {
       // the message we just inserted:
       request("http://127.0.0.1:3000/classes/messages", function(error, response, body) {
         if (err) {console.log(err)}
-        console.log("RESPONSE IS " + response);
-        console.log("BODY IS " + body);
         var messageLog = JSON.parse(body);
-        expect(messageLog[0].message).to.equal("In mercy's name, three days is all I need.");
-        expect(messageLog[0].roomname).to.equal("Hello");
+        expect(messageLog[0].message).to.equal("What the...?");
+        expect(messageLog[0].roomname).to.equal("NotHello");
+        expect(messageLog[0].username).to.equal("Janny");
         done();
       });
     });
