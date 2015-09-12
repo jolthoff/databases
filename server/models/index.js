@@ -10,7 +10,7 @@ module.exports = {
 			callback(results);
     	})
     }, // a function which produces all the messages
-    post: function (message) { 
+    post: function (message, callback) { 
     	var post = {
     		username: message.username,
     		message: message.message,
@@ -18,7 +18,8 @@ module.exports = {
     	}
     	db.dbConnection.query('INSERT INTO messages SET ?', post, function(err, result) {
     		if (err) {throw err}
-    		console.log(result)
+            console.log("post to messages result is " + JSON.stringify(result))
+    		callback(result);
     	})
 	} // a function which can be used to insert a message into the database
   },
@@ -32,13 +33,14 @@ module.exports = {
 			callback(results);
     	})
     },
-    post: function (message) {
+    post: function (message, callback) {
     	var post = {
     		username: message.username
     	}
     	db.dbConnection.query('INSERT INTO users SET ?', post, function(err, result) {
     		if (err) {throw err}
-    		console.log(result);
+            console.log("post to users result is " + JSON.stringify(result))
+    		callback(result);
     	})
     }
   }

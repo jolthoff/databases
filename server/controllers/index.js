@@ -6,13 +6,15 @@ module.exports = {
   messages: {
     get: function (req, res) {
     	models.messages.get(req.body, function(results) {
-    		res.send(JSON.stringify(results));
+    		res.send(200, JSON.stringify(results));
     	});
     }, 
     post: function (req, res) { 
     	console.log('posting')
-    	models.messages.post(req.body);
-    	res.send(201);
+    	models.messages.post(req.body, function(results) {
+        res.send(201);
+      });
+    	
   	}
   },
 
@@ -24,8 +26,9 @@ module.exports = {
     	});
     },
     post: function (req, res) {
-    	models.users.post(req.body)
-    	res.send(201);
+    	models.users.post(req.body, function() {
+        res.send(201);
+      })
     }
   }
 };
