@@ -11,16 +11,21 @@ describe("Persistent Node Chat Server", function() {
   beforeEach(function(done) {
     dbConnection = mysql.createConnection({
       user: "root",
-      password: "",
+      password: "12345",
       database: "chat"
     });
     dbConnection.connect();
 
-       var tablename = ""; // TODO: fill this out
-
+       var tablename = "messages"; // TODO: fill this out
+       // dbConnection.query('TRUNCATE TABLE messages', function(err, result) {
+       //  if (err) {console.log(err)}
+       // })
+       // dbConnection.query('TRUNCATE TABLE users', function(err, result) {
+       //  if (err) {console.log(err)}
+       // })
     /* Empty the db table before each test so that multiple tests
      * (or repeated runs of the tests) won't screw each other up: */
-    dbConnection.query("truncate " + tablename, done);
+    dbConnection.query("select * from " + tablename, done);
   });
 
   afterEach(function() {
@@ -50,12 +55,12 @@ describe("Persistent Node Chat Server", function() {
         var queryString = "SELECT * FROM messages";
         var queryArgs = [];
 
-        dbConnection.query(queryString, queryArgs, function(err, results) {
+        dbConnection.query(queryString, function(err, results) {
           // Should have one result:
           expect(results.length).to.equal(1);
 
           // TODO: If you don't have a column named text, change this test.
-          expect(results[0].text).to.equal("In mercy's name, three days is all I need.");
+          expect(results[0].message).to.equal("In mercy's name, three days is all I need.");
 
           done();
         });
@@ -65,20 +70,25 @@ describe("Persistent Node Chat Server", function() {
 
   it("Should output all messages from the DB", function(done) {
     // Let's insert a message into the db
-       var tablename = ""; // TODO: fill this out
+       var tablename = "messages"; // TODO: fill this out
     // TODO - The exact query string and query args to use
     // here depend on the schema you design, so I'll leave
     // them up to you. */
 
-    dbConnection.query(queryString, queryArgs, function(err) {
+    var queryString = "SELECT * FROM messages";
+
+    dbConnection.query(queryString, function(err) {
       if (err) { throw err; }
 
       // Now query the Node chat server and see if it returns
       // the message we just inserted:
       request("http://127.0.0.1:3000/classes/messages", function(error, response, body) {
+        if (err) {console.log(err)}
+        console.log("RESPONSE IS " + response);
+        console.log("BODY IS " + body);
         var messageLog = JSON.parse(body);
-        expect(messageLog[0].text).to.equal("Men like you can never change!");
-        expect(messageLog[0].roomname).to.equal("main");
+        expect(messageLog[0].message).to.equal("In mercy's name, three days is all I need.");
+        expect(messageLog[0].roomname).to.equal("Hello");
         done();
       });
     });
